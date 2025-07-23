@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPA Messenger Auth Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    .hidden { display: none; }
+    form input, button { margin: 0.5em 0; display: block; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="main-view">
+      <h2>Welcome</h2>
+      <button onclick="navigate('/login')">Login</button>
+      <button onclick="navigate('/register')">Register</button>
+    </div>
+
+    <div id="login-view" class="hidden">
+      <h2>Login</h2>
+      <form id="login-form">
+        <input name="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+    <div id="register-view" class="hidden">
+      <h2>Register</h2>
+      <form id="register-form">
+        <input name="pn" placeholder="Public Name" required />
+        <input name="un" placeholder="Username" required />
+        <input name="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Register</button>
+      </form>
+    </div>
+
+    <div id="chat-view" class="hidden">
+      <h2>Chat</h2>
+      <pre id="chat-data"></pre>
+    </div>
+  </div>
+
+  <script src  = "frontend/script.js" defer></script>
+</body>
+</html>
