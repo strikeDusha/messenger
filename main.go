@@ -4,18 +4,22 @@ import (
 	"log"
 	"messenger/database"
 	"messenger/handlers"
+	"messenger/ws"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	hub := ws.NewHub()
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	raw, err := database.OpenUsers()
 	if err != nil {
 		log.Fatalf("an error occured during opening database %v", err)
 	}
-	db := &handlers.DB{Storage: raw}
+
+	db := handlers.NewDB(raw, hub)
 	routs(router, db)
+
 	router.Run(":8080")
 }

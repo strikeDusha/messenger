@@ -3,30 +3,13 @@ package database
 import (
 	"crypto/sha256"
 	"database/sql"
+	"log"
 	"os"
-	"time"
 
 	_ "modernc.org/sqlite"
 )
 
 var salt = os.Getenv("SALT")
-
-type User struct {
-	PublicName string `json:"pn"  binding:"required,min=2,max=30"`
-	Username   string `json:"un"  binding:"required,min=5,max=20"` //later bind
-	Email      string `json:"email"  binding:"required,email"`
-	Password   string `json:"password"  binding:"required"` //later bind
-}
-type Message struct {
-	Sender   string
-	Reciever string
-	Text     string
-	Sent     time.Time
-}
-
-type Storage struct {
-	db *sql.DB
-}
 
 func OpenUsers() (*Storage, error) {
 	database, err := sql.Open("sqlite", "./DB.sqlite3")
@@ -49,7 +32,7 @@ func OpenUsers() (*Storage, error) {
 	st2, err := database.Prepare(`CREATE TABLE IF NOT EXISTS messages(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		sender TEXT REFERENCES users(un),
-		reciever TEXT REFERENCES users(un),
+		receiver TEXT REFERENCES users(un),
 		content TEXT NOT NULL ,
 		sent TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)
@@ -107,6 +90,39 @@ func (s *Storage) GetByUsername(username string) (*User, error) {
 	return &u, nil
 }
 
-func (s *Storage) GetAllChatMessages(seUn string, reUn string) int16 {
-	return 1488
+func (s *Storage) AddMessage(m *Message) error {
+	q := "INSERT INTO messages (sender ,receiver ,content,sent) VALUES (?,?,?,?)"
+	st, err := s.db.Prepare(q)
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	_, err = st.Exec(m.Sender, m.Receiver, m.Text, m.Sent)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) GetChat(se string, re string) ([]*MsgMini, error) {
+
+	row, err := s.db.Query("SELECT text,sent FROM users WHERE sender  = ? AND receiver  = ?", se, re)
+	if err != nil {
+		return nil, err
+	}
+
+	var msg []*MsgMini
+	defer row.Close()
+	for row.Next() {
+		var u MsgMini
+		if err := row.Scan(&u.Text, &u.Time); err != nil {
+			return nil, err
+		}
+		msg = append(msg, &u)
+	}
+	if err := row.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return msg, nil
 }

@@ -12,12 +12,7 @@ import (
 
 // переименовать все err для фронтенда
 
-type DB struct {
-	*database.Storage
-	//mongo for chat
-}
-
-func (s *DB) HandleRegister(c *gin.Context) {
+func (d *DB) HandleRegister(c *gin.Context) {
 	var user database.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(400, gin.H{
@@ -25,7 +20,7 @@ func (s *DB) HandleRegister(c *gin.Context) {
 		})
 		return
 	}
-	err := s.Storage.AddUser(&user)
+	err := d.s.AddUser(&user)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "database",
@@ -50,7 +45,7 @@ func (s *DB) HandleRegister(c *gin.Context) {
 
 }
 
-func (s *DB) HandleLogin(c *gin.Context) {
+func (d *DB) HandleLogin(c *gin.Context) {
 
 	var login struct {
 		Email    string `json:"email"`
@@ -62,7 +57,7 @@ func (s *DB) HandleLogin(c *gin.Context) {
 		})
 		return
 	}
-	user, err := s.GetUser2Auth(login.Email, login.Password)
+	user, err := d.s.GetUser2Auth(login.Email, login.Password)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "db err",

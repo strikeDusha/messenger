@@ -37,13 +37,21 @@
         <button type="submit">Register</button>
       </form>
     </div>
-
     <div id="chat-view" class="hidden">
-      <h2>Chat</h2>
-      <pre id="chat-data"></pre>
-    </div>
+  <h2>Chat</h2>
+  <div id="messages" 
+       style="height:200px;overflow-y:auto;border:1px solid #ccc;padding:0.5em">
+  </div>
+  <input id="chat-to"   placeholder="To (username)" />
+  <input id="chat-text" placeholder="Message" />
+  <button id="chat-send">Send</button>
+</div>
+
+
   </div>
 
-  <script src  = "frontend/script.js" defer></script>
+  <script src  = "/frontend/auth.js" defer></script>
+  <script src  = "/frontend/chat.js" defer></script>
+  
 </body>
 </html>
