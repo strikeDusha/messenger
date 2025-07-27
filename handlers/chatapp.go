@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"log"
-	"messenger/ws"
 
 	"net/http"
 
@@ -25,11 +24,11 @@ func (s *DB) ServeWs(c *gin.Context) {
 	}
 	log.Printf("▶▶▶ ServeWs: upgraded for %s\n", username)
 
-	client := &ws.Client{Conn: conn, Username: username, Send: make(chan []byte)}
+	client := NewClient(conn, username, make(chan []byte))
 	s.H.Register <- client
 	log.Println("▶▶▶ ServeWs: client registered in hub")
 
-	go s.H.WritePump(client)
-	go s.H.ReadPump(client)
+	go s.H.WritePump(client) // write without database
+	go s.ReadPump(client)    // read with database
 	log.Println("▶▶▶ ServeWs: launched pumps")
 }

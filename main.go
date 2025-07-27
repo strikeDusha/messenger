@@ -4,13 +4,12 @@ import (
 	"log"
 	"messenger/database"
 	"messenger/handlers"
-	"messenger/ws"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	hub := ws.NewHub()
+	hub := handlers.NewHub()
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	raw, err := database.OpenUsers()

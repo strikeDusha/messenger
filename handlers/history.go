@@ -12,11 +12,11 @@ func (d *DB) History(c *gin.Context) {
 	se, _ := c.Get("username")
 	ss, _ := se.(string)
 	var msgs []*database.MsgMini
-	mine, err := d.s.GetChat(ss, re) // []*MsgMini { text,time} of mine messages
+	mine, err := d.S.GetChat(ss, re) // []*MsgMini { text,time} of mine messages
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
-	his, err := d.s.GetChat(re, ss)
+	his, err := d.S.GetChat(re, ss)
 	if err != nil {
 		c.AbortWithStatus(500)
 	}

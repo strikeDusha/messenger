@@ -4,7 +4,7 @@ import "github.com/gin-gonic/gin"
 
 func (s *DB) IsLoggedIn(c *gin.Context) {
 	un, _ := c.Get("username")
-	usr, err := s.s.GetByUsername(un.(string))
+	usr, err := s.S.GetByUsername(un.(string))
 	if err != nil || usr == nil {
 		c.JSON(404, gin.H{"error": "user not found"})
 		return

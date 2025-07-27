@@ -1,38 +1,15 @@
-package ws
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"messenger/database"
-	"sync"
+
 	"time"
 
 	"github.com/gorilla/websocket"
 )
-
-type Client struct { // client
-	Conn     *websocket.Conn
-	Username string
-	Send     chan []byte
-}
-
-type Hub struct { // хаб, всем управляет
-	Mu         sync.Mutex            // что бы мапу с горутинами подружить
-	Clients    map[string]*Client    // мапа клиентов по юзернейму
-	Register   chan *Client          // поток для регистрации клиентов на вебсокет
-	Unregister chan *Client          // поток для того что бы удалить
-	Broadcast  chan database.Message // канал для сообщений
-}
-
-func NewHub() *Hub {
-	return &Hub{
-		Clients:    make(map[string]*Client),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Broadcast:  make(chan database.Message),
-	}
-}
 
 func (h *Hub) Run() { //функция обслуживающая наши потоки в main go
 
@@ -67,7 +44,8 @@ func (h *Hub) Run() { //функция обслуживающая наши по�
 	}
 }
 
-func (h *Hub) ReadPump(c *Client) {
+func (d *DB) ReadPump(c *Client) {
+	h := d.H
 	defer func() {
 		h.Unregister <- c
 		c.Conn.Close()
@@ -78,23 +56,24 @@ func (h *Hub) ReadPump(c *Client) {
 			log.Println("readPump ReadMessage error:", err)
 			break
 		}
-		log.Printf("readPump raw message: %s\n", string(msgBytes))
+		//log.Printf("readPump raw message: %s\n", string(msgBytes))
 
 		var m database.Message
 		if err := json.Unmarshal(msgBytes, &m); err != nil {
 			log.Println("readPump Unmarshal error:", err)
 			continue
 		}
-		log.Printf("readPump unmarshaled: %+v\n", m)
+		//log.Printf("readPump unmarshaled: %+v\n", m)
 
 		m.Sender = c.Username
 		m.Sent = time.Now()
-		log.Printf("readPump sending to broadcast: %+v\n", m)
+		d.S.AddMessage(&m)
+		//log.Printf("readPump sending to broadcast: %+v\n", m)
 		h.Broadcast <- m
 	}
 }
 func (h *Hub) WritePump(c *Client) {
-	log.Println("w pump")
+	//log.Println("w pump")
 	for msg := range c.Send { // а тут не ебу вообще че происходит и движа с жсоном нету
 		c.Conn.WriteMessage(websocket.TextMessage, msg)
 	}

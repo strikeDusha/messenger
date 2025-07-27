@@ -20,7 +20,7 @@ func (d *DB) HandleRegister(c *gin.Context) {
 		})
 		return
 	}
-	err := d.s.AddUser(&user)
+	err := d.S.AddUser(&user)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "database",
@@ -57,7 +57,7 @@ func (d *DB) HandleLogin(c *gin.Context) {
 		})
 		return
 	}
-	user, err := d.s.GetUser2Auth(login.Email, login.Password)
+	user, err := d.S.GetUser2Auth(login.Email, login.Password)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "db err",
